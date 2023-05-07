@@ -76,14 +76,10 @@ public class PlayerMovement2 : MonoBehaviour
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
-           
         }
+
         moveDirection = new Vector3(moveHorizontal, 0, moveVertical);
-
-       
-
         moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
-        transform.LookAt(transform.position +moveDirection) ;
 
         // Smoothly rotate the character towards the move direction
         if (moveDirection != Vector3.zero)
@@ -92,23 +88,22 @@ public class PlayerMovement2 : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
 
-        if (moveDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
+      
+            if (moveDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
             {
                 Walk();
             }
-
             else if (moveDirection != Vector3.zero && Input.GetKey(KeyCode.LeftShift))
             {
                 Run();
             }
-
             else if (moveDirection == Vector3.zero)
             {
                 Idle();
             }
 
-
-         moveDirection *= moveSpeed;
+            moveDirection *= moveSpeed;
+        
 
         controller.Move(moveDirection * Time.deltaTime);
 

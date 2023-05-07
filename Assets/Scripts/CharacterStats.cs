@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterStats : MonoBehaviour
 {
@@ -18,6 +19,10 @@ public class CharacterStats : MonoBehaviour
     {
         currentHealth += value;
         Debug.Log("current health " + currentHealth + "/" + maxHealth);
+
+        //if (transform.CompareTag("Enemy"))
+            transform.Find("Canvas").GetChild(1).GetComponent<Image>().fillAmount = currentHealth / maxHealth;
+
         if (currentHealth <= 0) {
             Die();
         }
