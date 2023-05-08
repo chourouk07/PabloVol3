@@ -9,7 +9,7 @@ public class PlayerMovement2 : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
-   
+    [SerializeField] private Transform cameraTransform;
 
     //CharacterController characterController;
     private Vector3 moveDirection;
@@ -68,8 +68,23 @@ public class PlayerMovement2 : MonoBehaviour
 
     private void Move()
     {
-        var moveHorizontal = Input.GetAxis("Horizontal");
-        var moveVertical = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+        Vector3 cameraForward = cameraTransform.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
+
+        Vector3 movementDirection = (horizontalInput * cameraTransform.right + verticalInput * cameraForward).normalized;
+        float inputMagnitude = Mathf.Clamp01(movementDirection.magnitude);
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
+            inputMagnitude /= 2;
+        }
+
+        float speed = inputMagnitude * moveSpeed;
+        velocity = movementDirection * speed;
 
         isGrounded = Physics.CheckSphere(transform.position, groundCheckDistance, groundMask);
 
@@ -78,34 +93,27 @@ public class PlayerMovement2 : MonoBehaviour
             velocity.y = -2f;
         }
 
-        moveDirection = new Vector3(moveHorizontal, 0, moveVertical);
-        moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
-
         // Smoothly rotate the character towards the move direction
-        if (moveDirection != Vector3.zero)
+        if (movementDirection != Vector3.zero)
         {
-            var targetRotation = Quaternion.LookRotation(moveDirection);
+            var targetRotation = Quaternion.LookRotation(movementDirection);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
 
-      
-            if (moveDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
-            {
-                Walk();
-            }
-            else if (moveDirection != Vector3.zero && Input.GetKey(KeyCode.LeftShift))
-            {
-                Run();
-            }
-            else if (moveDirection == Vector3.zero)
-            {
-                Idle();
-            }
+        if (movementDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
+        {
+            Walk();
+        }
+        else if (movementDirection != Vector3.zero && Input.GetKey(KeyCode.LeftShift))
+        {
+            Run();
+        }
+        else if (movementDirection == Vector3.zero)
+        {
+            Idle();
+        }
 
-            moveDirection *= moveSpeed;
-        
-
-        controller.Move(moveDirection * Time.deltaTime);
+        controller.Move(velocity * Time.deltaTime);
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
@@ -167,4 +175,15 @@ public class PlayerMovement2 : MonoBehaviour
         Gizmos.DrawSphere(transform.position, groundCheckDistance);
     }
     /**/
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
 }
