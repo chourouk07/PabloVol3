@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CharacterStats : MonoBehaviour
@@ -32,7 +33,7 @@ public class CharacterStats : MonoBehaviour
     {
         if (transform.CompareTag("Player"))
         {
-            //game over
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
         else if (transform.CompareTag("Enemy"))
         {
